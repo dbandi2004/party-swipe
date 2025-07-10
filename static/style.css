@@ -1,0 +1,103 @@
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen;
+  background: #111;
+  color: white;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.card-container {
+  position: relative;
+  width: 95vw;
+  max-width: 400px;
+  height: 75vh;
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+.card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  background-color: #000;
+  transition: all 0.3s ease;
+}
+
+.card-container .card:nth-last-child(1) { z-index: 3; }
+.card-container .card:nth-last-child(2) { z-index: 2; }
+.card-container .card:nth-last-child(3) { z-index: 1; }
+
+.card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  width: 100%;
+  padding: 16px;
+  color: white;
+}
+
+.info h2 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.info p {
+  margin: 8px 0 4px;
+  font-size: 14px;
+}
+
+.tags {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 10px;
+  border-radius: 16px;
+  font-size: 12px;
+  border: 1px solid #fff;
+}
+
+.buttons {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.buttons button {
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+}
+
+.dislike {
+  background: #ff3c3c;
+}
+
+.like {
+  background: #4cd964;
+}

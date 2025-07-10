@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Party Swipe</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <div class="card-container" id="deck">
+    {% for user in users %}
+  <div class="card" data-index="{{ loop.index0 }}">
+    <img src="{{ '/' + user.photos[0] }}" alt="photo">
+    <div class="info">
+      <h2>{{ user.name }}, {{ user.age }}</h2>
+      <p>{{ user.bio }}</p>
+      <div class="tags">
+        {% for tag in user.tags %}
+          <div class="tag">{{ tag }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endfor %}
+
+  </div>
+
+  <div class="buttons">
+    <button class="dislike" onclick="swipeLeft()">✘</button>
+    <button class="like" onclick="swipeRight()">❤</button>
+  </div>
+
+  <script>
+    const deck = document.getElementById('deck');
+    const likeAPI = "/like";
+
+    function showMatch(name) {
+      const modal = document.createElement("div");
+      modal.style.position = "fixed";
+      modal.style.top = 0;
+      modal.style.left = 0;
+      modal.style.width = "100%";
+      modal.style.height = "100%";
+      modal.style.background = "rgba(0,0,0,0.85)";
+      modal.style.color = "#fff";
+      modal.style.display = "flex";
+      modal.style.flexDirection = "column";
+      modal.style.alignItems = "center";
+      modal.style.justifyContent = "center";
+      modal.style.zIndex = 9999;
+      modal.innerHTML = `<h1>🔥 It's a Match with ${name}!</h1><button onclick="this.parentElement.remove()">Continue</button>`;
+      document.body.appendChild(modal);
+    }
+
+    function handleLike(index, name) {
+      fetch(`${likeAPI}?to=${index}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.match) showMatch(name);
+        });
+    }
+
+    function swipeLeft() {
+      const card = deck.lastElementChild;
+      if (!card) return;
+      card.style.transform = 'translateX(-100vw) rotate(-15deg)';
+      card.style.transition = '0.3s ease';
+      setTimeout(() => card.remove(), 300);
+    }
+
+    function swipeRight() {
+      const card = deck.lastElementChild;
+      if (!card) return;
+
+      const name = card.querySelector('h2')?.innerText.split(',')[0];
+      const index = parseInt(card.dataset.index);
+
+      card.style.transform = 'translateX(100vw) rotate(15deg)';
+      card.style.transition = '0.3s ease';
+      setTimeout(() => card.remove(), 300);
+      handleLike(index, name);
+    }
+
+    function setupSwipe(card, index, name) {
+      let isDragging = false;
+      let startX;
+
+      card.addEventListener('mousedown', start);
+      card.addEventListener('touchstart', start);
+
+      function start(e) {
+        isDragging = true;
+        startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+
+        document.addEventListener('mousemove', move);
+        document.addEventListener('mouseup', end);
+        document.addEventListener('touchmove', move);
+        document.addEventListener('touchend', end);
+      }
+
+      function move(e) {
+        if (!isDragging) return;
+        const x = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+        const deltaX = x - startX;
+        card.style.transform = `translateX(${deltaX}px) rotate(${deltaX / 20}deg)`;
+      }
+
+      function end(e) {
+        const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
+        const deltaX = endX - startX;
+        isDragging = false;
+
+        const name = card.querySelector('h2')?.innerText.split(',')[0];
+        const index = parseInt(card.dataset.index);
+
+        if (deltaX > 100) {
+          card.style.transform = 'translateX(100vw) rotate(15deg)';
+          card.style.transition = '0.3s ease';
+          setTimeout(() => card.remove(), 300);
+          handleLike(index, name);
+        } else if (deltaX < -100) {
+          card.style.transform = 'translateX(-100vw) rotate(-15deg)';
+          card.style.transition = '0.3s ease';
+          setTimeout(() => card.remove(), 300);
+        } else {
+          card.style.transform = '';
+          card.style.transition = '0.3s ease';
+        }
+
+        document.removeEventListener('mousemove', move);
+        document.removeEventListener('mouseup', end);
+        document.removeEventListener('touchmove', move);
+        document.removeEventListener('touchend', end);
+      }
+    }
+
+    document.querySelectorAll('.card').forEach((card) => {
+      const name = card.querySelector('h2')?.innerText.split(',')[0];
+      const index = parseInt(card.dataset.index);
+      setupSwipe(card, index, name);
+    });
+  </script>
+</body>
+</html>
