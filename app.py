@@ -147,6 +147,28 @@ def get_messages(chat_id):
     } for m in messages_ref]
 
     return {"messages": messages}
+@app.route('/matches')
+def matches():
+    current_id = session.get("current_user_id")
+    if not current_id:
+        return redirect(url_for('index'))
+
+    # Find all matches where current user is involved
+    match_docs = db.collection("matches")\
+        .where("users", "array_contains", current_id).stream()
+
+    matched_users = []
+    for doc in match_docs:
+        match_data = doc.to_dict()
+        other_id = [uid for uid in match_data["users"] if uid != current_id][0]
+        user_doc = db.collection("users").document(other_id).get()
+        if user_doc.exists:
+            user = user_doc.to_dict()
+            user["id"] = user_doc.id
+            matched_users.append(user)
+
+    return render_template("matches.html", matches=matched_users)
+
 
 # ---------- DEPLOY ----------
 if __name__ == '__main__':

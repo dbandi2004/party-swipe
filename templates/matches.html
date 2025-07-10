@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Matches</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      padding: 20px;
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .match {
+      padding: 10px;
+      margin: 10px 0;
+      background: #222;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .match img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 15px;
+    }
+
+    .match span {
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Your Matches</h2>
+
+  {% for user in matches %}
+    <div class="match" onclick="window.location='/chat/{{ user.id }}'">
+      <img src="{{ '/' + user.photos[0] }}" alt="pic">
+      <span>{{ user.name }}, {{ user.age }}</span>
+    </div>
+  {% endfor %}
+
+</body>
+</html>
