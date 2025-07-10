@@ -1,12 +1,14 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.utils import secure_filename
-import os
-import uuid
 from firebase_config import db
+import os, uuid
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 app.config['UPLOAD_FOLDER'] = 'static/uploads'
+
+# ---------- ROUTES ----------
 
 @app.route('/')
 def index():
@@ -21,7 +23,7 @@ def submit():
 
     photo_urls = []
     for f in files[:3]:
-        if f.filename != '':
+        if f.filename:
             filename = secure_filename(f.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(filepath)
@@ -36,7 +38,7 @@ def submit():
     }
 
     user_ref = db.collection("users").add(user_data)
-    session['current_user_id'] = user_ref[1].id  # document ID
+    session['current_user_id'] = user_ref[1].id
     return redirect(url_for('profile'))
 
 @app.route('/profile')
@@ -65,29 +67,89 @@ def like():
     from_id = session.get("current_user_id")
     to_index = int(request.args.get("to"))
 
-    # Get all users (same as profile order)
     all_users = list(db.collection("users").stream())
     to_user_doc = all_users[to_index]
     to_user_id = to_user_doc.id
 
-    # Add the like to Firestore
     db.collection("likes").add({
         "from": from_id,
         "to": to_user_id
     })
 
-    # Check if to_user has already liked from_user
-    existing = db.collection("likes")\
+    reverse_like = db.collection("likes")\
         .where("from", "==", to_user_id)\
         .where("to", "==", from_id)\
-        .stream()
+        .limit(1).stream()
 
-    match = any(True for _ in existing)
+    is_match = any(True for _ in reverse_like)
 
-    return {"match": match}
+    if is_match:
+        db.collection("matches").add({
+            "users": sorted([from_id, to_user_id]),
+            "timestamp": datetime.utcnow()
+        })
 
+    return {"match": is_match}
+
+# ---------- CHAT BACKEND ----------
+
+def get_or_create_chat(user1_id, user2_id):
+    users_sorted = sorted([user1_id, user2_id])
+    chat_query = db.collection("chats")\
+        .where("users", "==", users_sorted).limit(1).stream()
+    
+    for chat in chat_query:
+        return chat.id  # existing chat
+
+    new_chat = db.collection("chats").add({
+        "users": users_sorted,
+        "created_at": datetime.utcnow()
+    })
+    return new_chat[1].id
+
+@app.route('/chat/<other_id>')
+def open_chat(other_id):
+    current_id = session.get('current_user_id')
+    if not current_id:
+        return redirect(url_for('index'))
+
+    chat_id = get_or_create_chat(current_id, other_id)
+    return render_template("chat.html", chat_id=chat_id, to_id=other_id)
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    from_id = session.get("current_user_id")
+    to_id = request.form.get("to_id")
+    text = request.form.get("text")
+
+    if not (from_id and to_id and text):
+        return {"error": "Missing data"}, 400
+
+    chat_id = get_or_create_chat(from_id, to_id)
+
+    db.collection("chats").document(chat_id).collection("messages").add({
+        "sender": from_id,
+        "text": text,
+        "timestamp": datetime.utcnow()
+    })
+
+    return {"success": True, "chat_id": chat_id}
+
+@app.route('/messages/<chat_id>')
+def get_messages(chat_id):
+    messages_ref = db.collection("chats").document(chat_id).collection("messages")\
+        .order_by("timestamp").stream()
+    
+    messages = [{
+        "sender": m.to_dict()["sender"],
+        "text": m.to_dict()["text"],
+        "timestamp": m.to_dict()["timestamp"].isoformat()
+    } for m in messages_ref]
+
+    return {"messages": messages}
+
+# ---------- DEPLOY ----------
 if __name__ == '__main__':
     if not os.path.exists(app.config['UPLOAD_FOLDER']):
         os.makedirs(app.config['UPLOAD_FOLDER'])
     app.run(debug=True, host='0.0.0.0', port=10000)
-
