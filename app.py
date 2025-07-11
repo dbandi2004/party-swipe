@@ -160,7 +160,11 @@ def matches():
     matched_users = []
     for doc in match_docs:
         match_data = doc.to_dict()
-        other_id = [uid for uid in match_data["users"] if uid != current_id][0]
+        others = [uid for uid in match_data["users"] if uid != current_id]
+		if not others:
+			continue  # skip if no other user in the match
+		other_id = others[0]
+
         user_doc = db.collection("users").document(other_id).get()
         if user_doc.exists:
             user = user_doc.to_dict()

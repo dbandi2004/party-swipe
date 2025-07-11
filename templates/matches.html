@@ -3,16 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>Your Matches</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #121212;
-      color: white;
-      padding: 20px;
-    }
-
-    h2 {
-      text-align: center;
+    .matches-container {
+      padding: 80px 20px 70px; /* extra bottom for tab bar */
     }
 
     .match {
@@ -35,19 +29,33 @@
 
     .match span {
       font-size: 18px;
+      color: white;
+    }
+
+    h2 {
+      text-align: center;
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <h2>Your Matches</h2>
+  <div class="matches-container">
+    <h2>Your Matches</h2>
 
-  {% for user in matches %}
-    <div class="match" onclick="window.location='/chat/{{ user.id }}'">
-      <img src="{{ '/' + user.photos[0] }}" alt="pic">
-      <span>{{ user.name }}, {{ user.age }}</span>
-    </div>
-  {% endfor %}
+    {% for user in matches %}
+      <div class="match" onclick="window.location='/chat/{{ user.id }}'">
+        <img src="{{ '/' + user.photos[0] }}" alt="pic">
+        <span>{{ user.name }}, {{ user.age }}</span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Bottom Tab Bar -->
+  <div class="tab-bar">
+    <a href="{{ url_for('profile') }}" class="tab">Swipe</a>
+    <a href="{{ url_for('matches') }}" class="tab active">Messages</a>
+  </div>
 
 </body>
 </html>
