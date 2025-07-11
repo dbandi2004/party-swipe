@@ -65,11 +65,8 @@ def profile():
 @app.route('/like')
 def like():
     from_id = session.get("current_user_id")
-    to_index = int(request.args.get("to"))
+    to_user_id = request.args.get("to_id")
 
-    all_users = list(db.collection("users").stream())
-    to_user_doc = all_users[to_index]
-    to_user_id = to_user_doc.id
 
     db.collection("likes").add({
         "from": from_id,
