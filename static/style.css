@@ -125,3 +125,98 @@ body {
   color: #fff;
   border-bottom: 2px solid #ff5c5c;
 }
+/* === ONBOARDING PAGE STYLES === */
+
+.onboarding-body {
+  background: linear-gradient(135deg, #ff355e, #ff603d);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.onboarding-card {
+  background: white;
+  padding: 40px 30px;
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+  animation: fadeIn 0.6s ease;
+}
+
+.onboarding-card h1 {
+  color: #ff355e;
+  margin-bottom: 25px;
+  font-size: 28px;
+}
+
+.onboarding-form input,
+.onboarding-form textarea {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.onboarding-form textarea {
+  resize: none;
+  height: 60px;
+}
+
+.photo-upload label {
+  font-weight: bold;
+  font-size: 14px;
+  color: #555;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.onboarding-form input[type="file"] {
+  background: #f4f4f4;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.onboarding-form button {
+  margin-top: 10px;
+  width: 100%;
+  padding: 14px;
+  background: #ff355e;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.onboarding-form button:hover {
+  background: #e0274e;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.preview-container {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.preview-container img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #ff5c5c;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
