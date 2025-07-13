@@ -29,8 +29,9 @@ body {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-  background-color: #000;
-  transition: all 0.3s ease;
+  background-color: #111;
+  border: 1px solid #333;
+  transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .card-container .card:nth-last-child(1) { z-index: 3; }
@@ -219,4 +220,112 @@ body {
   border-radius: 12px;
   border: 2px solid #ff5c5c;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+.photo-preview-area {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.preview-item {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: grab;
+  border: 2px solid #444;
+  transition: transform 0.3s ease;
+}
+
+.preview-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  background: rgba(255, 0, 0, 0.8);
+  border-radius: 50%;
+  padding: 2px 6px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  font-size: 14px;
+}
+/* Reusable swipe buttons */
+.buttons {
+  margin-top: 30px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.buttons button {
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.dislike {
+  background: #ff3c3c;
+}
+
+.like {
+  background: #4cd964;
+}
+.carousel {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+.hidden {
+  display: none;
+}
+
+.carousel img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.carousel img.active {
+  opacity: 1;
+}
+.carousel-nav {
+  position: absolute;
+  bottom: 12px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 2;
+}
+
+.carousel-nav button {
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
+  font-size: 22px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.carousel-nav button:hover {
+  background: rgba(0, 0, 0, 0.8);
 }

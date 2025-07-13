@@ -1,7 +1,8 @@
+<!-- /templates/profile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Party Swipe</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
@@ -10,13 +11,23 @@
   <div class="card-container" id="deck">
     {% for user in users %}
     <div class="card" data-id="{{ user.id }}">
-      <img src="{{ '/' + user.photos[0] }}" alt="photo">
+      <div class="carousel">
+        {% for photo in user.photos %}
+        <img src="{{ '/' + photo }}" alt="photo" class="{% if not loop.first %}hidden{% endif %}">
+        {% endfor %}
+        {% if user.photos|length > 1 %}
+        <div class="carousel-nav">
+          <button class="prev">‹</button>
+          <button class="next">›</button>
+        </div>
+        {% endif %}
+      </div>
       <div class="info">
         <h2>{{ user.name }}, {{ user.age }}</h2>
         <p>{{ user.bio }}</p>
         <div class="tags">
           {% for tag in user.tags %}
-            <div class="tag">{{ tag }}</div>
+          <div class="tag">{{ tag }}</div>
           {% endfor %}
         </div>
       </div>
@@ -29,7 +40,6 @@
     <button class="like" onclick="swipeRight()">❤</button>
   </div>
 
-  <!-- Bottom Tab Bar -->
   <div class="tab-bar">
     <a href="{{ url_for('profile') }}" class="tab active">Swipe</a>
     <a href="{{ url_for('matches') }}" class="tab">Messages</a>
@@ -76,10 +86,8 @@
     function swipeRight() {
       const card = deck.lastElementChild;
       if (!card) return;
-
       const name = card.querySelector('h2')?.innerText.split(',')[0];
       const userId = card.dataset.id;
-
       card.style.transform = 'translateX(100vw) rotate(15deg)';
       card.style.transition = '0.3s ease';
       setTimeout(() => card.remove(), 300);
@@ -96,7 +104,6 @@
       function start(e) {
         isDragging = true;
         startX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
-
         document.addEventListener('mousemove', move);
         document.addEventListener('mouseup', end);
         document.addEventListener('touchmove', move);
@@ -114,7 +121,6 @@
         const endX = e.type.includes('touch') ? e.changedTouches[0].clientX : e.clientX;
         const deltaX = endX - startX;
         isDragging = false;
-
         const name = card.querySelector('h2')?.innerText.split(',')[0];
         const userId = card.dataset.id;
 
@@ -139,10 +145,37 @@
       }
     }
 
+    function setupCarousel(card) {
+      const images = card.querySelectorAll('img');
+      const prev = card.querySelector('.prev');
+      const next = card.querySelector('.next');
+      if (!prev || !next) return;
+      let current = 0;
+
+      function update() {
+        images.forEach((img, i) => {
+          img.classList.toggle('hidden', i !== current);
+        });
+      }
+
+      next.addEventListener('click', () => {
+        current = (current + 1) % images.length;
+        update();
+      });
+
+      prev.addEventListener('click', () => {
+        current = (current - 1 + images.length) % images.length;
+        update();
+      });
+
+      update();
+    }
+
     document.querySelectorAll('.card').forEach((card) => {
       const name = card.querySelector('h2')?.innerText.split(',')[0];
       const userId = card.dataset.id;
       setupSwipe(card, userId, name);
+      setupCarousel(card);
     });
   </script>
 </body>
