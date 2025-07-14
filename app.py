@@ -27,7 +27,8 @@ def submit():
             filename = secure_filename(f.filename)
             filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(filepath)
-            photo_urls.append(filepath)
+            # Save path as relative to /static for use in templates
+            photo_urls.append(os.path.join("uploads", filename))
 
     user_data = {
         "name": name,
@@ -40,6 +41,7 @@ def submit():
     user_ref = db.collection("users").add(user_data)
     session['current_user_id'] = user_ref[1].id
     return redirect(url_for('profile'))
+
 
 @app.route('/profile')
 def profile():
